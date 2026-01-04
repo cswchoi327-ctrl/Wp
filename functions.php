@@ -1,158 +1,250 @@
 <?php
 /**
- * Template Name: 지원금 메인 페이지
- * Description: 지원금 정보를 표시하는 커스텀 템플릿
+ * 지원금 스킨 Functions
+ * functions.php에 추가할 코드
  */
 
-get_header(); 
+// 커스텀 포스트 타입 등록
+function register_support_card_post_type() {
+    register_post_type('support_card', [
+        'labels' => [
+            'name' => '지원금 카드',
+            'singular_name' => '지원금 카드',
+            'add_new' => '새 카드 추가',
+            'add_new_item' => '새 지원금 카드 추가',
+            'edit_item' => '카드 편집',
+            'view_item' => '카드 보기',
+            'search_items' => '카드 검색',
+            'not_found' => '카드가 없습니다',
+        ],
+        'public' => true,
+        'has_archive' => false,
+        'menu_icon' => 'dashicons-money-alt',
+        'supports' => ['title', 'excerpt', 'page-attributes'],
+        'show_in_rest' => true,
+    ]);
+}
+add_action('init', 'register_support_card_post_type');
 
-// 메인 URL 설정
-$main_url = 'https://index1.jiwungum100.qzz.io';
+// 메타 박스 추가
+function add_support_card_meta_boxes() {
+    add_meta_box(
+        'support_card_details',
+        '카드 상세 정보',
+        'render_support_card_meta_box',
+        'support_card',
+        'normal',
+        'high'
+    );
+}
+add_action('add_meta_boxes', 'add_support_card_meta_boxes');
 
-// 탭 데이터
-$tabs = [
-    ['name' => '전국민 지원금', 'link' => 'https://index1.jiwungum100.qzz.io', 'active' => true],
-    ['name' => '청년지원금', 'link' => 'https://index1.jiwungum100.qzz.io', 'active' => false],
-    ['name' => '소상공인 지원금', 'link' => 'https://index1.jiwungum100.qzz.io', 'active' => false]
-];
-
-// 카드 데이터
-$cards = [
-    [
-        'keyword' => '근로장려금',
-        'amount' => '최대 330만원',
-        'amountSub' => '연 1회 일시지급',
-        'description' => '일하는 저소득층을 위한 근로소득 지원금',
-        'target' => '근로소득 3천만원 미만 가구',
-        'period' => '매년 5월',
-        'featured' => true
-    ],
-    [
-        'keyword' => '자녀장려금',
-        'amount' => '최대 100만원',
-        'amountSub' => '자녀 1명당 70만원',
-        'description' => '저소득층 자녀양육비 부담 완화를 위한 지원금',
-        'target' => '부부합산 소득 4천만원 미만',
-        'period' => '매년 5월',
-        'featured' => false
-    ]
-];
-
-?>
-
-<div class="support-main-wrapper">
-    <div class="support-container">
-        
-        <!-- 탭 네비게이션 -->
-        <div class="tab-wrapper">
-            <div class="support-container">
-                <nav class="tab-container">
-                    <ul class="tabs">
-                        <?php foreach ($tabs as $tab): ?>
-                        <li class="tab-item">
-                            <a class="tab-link <?php echo $tab['active'] ? 'active' : ''; ?>" 
-                               href="<?php echo esc_url($tab['link']); ?>">
-                                <?php echo esc_html($tab['name']); ?>
-                            </a>
-                        </li>
-                        <?php endforeach; ?>
-                    </ul>
-                </nav>
-            </div>
-        </div>
-
-        <!-- 상단 인트로 -->
-        <div class="intro-section">
-            <span class="intro-badge">신청마감 D-3일</span>
-            <p class="intro-sub">숨은 보험금 1분만에 찾기!</p>
-            <h2 class="intro-title">숨은 지원금 찾기</h2>
-        </div>
-
-        <!-- 애드센스 광고 -->
-        <?php if (function_exists('display_adsense_code')): ?>
-            <?php display_adsense_code(); ?>
-        <?php endif; ?>
-
-        <!-- 정보 박스 -->
-        <div class="info-box">
-            <div class="info-box-header">
-                <span class="info-box-icon">🏷️</span>
-                <span class="info-box-title">신청 안하면 절대 못 받아요</span>
-            </div>
-            <div class="info-box-amount">1인 평균 127만원 환급</div>
-            <p class="info-box-desc">대한민국 92%가 놓치고 있는 정부 지원금! 지금 확인하고 혜택 놓치지 마세요.</p>
-        </div>
-
-        <!-- 카드 그리드 -->
-        <div class="info-card-grid">
-            <?php 
-            $card_count = 0;
-            foreach ($cards as $card): 
-                // 광고 삽입 위치 (1, 4, 7번째 카드 전)
-                if (function_exists('display_inline_ad') && in_array($card_count, [0, 3, 6])):
-                    display_inline_ad();
-                endif;
-                $card_count++;
-            ?>
-            
-            <a class="info-card <?php echo $card['featured'] ? 'featured' : ''; ?>" 
-               href="<?php echo esc_url($main_url); ?>">
-                <div class="info-card-highlight">
-                    <?php if ($card['featured']): ?>
-                        <span class="info-card-badge">🔥 인기</span>
-                    <?php endif; ?>
-                    <div class="info-card-amount"><?php echo esc_html($card['amount']); ?></div>
-                    <div class="info-card-amount-sub"><?php echo esc_html($card['amountSub']); ?></div>
-                </div>
-                <div class="info-card-content">
-                    <h3 class="info-card-title"><?php echo esc_html($card['keyword']); ?></h3>
-                    <p class="info-card-desc"><?php echo esc_html($card['description']); ?></p>
-                    <div class="info-card-details">
-                        <div class="info-card-row">
-                            <span class="info-card-label">지원대상</span>
-                            <span class="info-card-value"><?php echo esc_html($card['target']); ?></span>
-                        </div>
-                        <div class="info-card-row">
-                            <span class="info-card-label">신청시기</span>
-                            <span class="info-card-value"><?php echo esc_html($card['period']); ?></span>
-                        </div>
-                    </div>
-                    <div class="info-card-btn">
-                        지금 바로 신청하기 <span class="btn-arrow">→</span>
-                    </div>
-                </div>
-            </a>
-            
-            <?php endforeach; ?>
-        </div>
-
-        <!-- 히어로 섹션 -->
-        <div class="hero-section">
-            <div class="hero-content">
-                <span class="hero-urgent">🔥 신청마감 D-3일</span>
-                <p class="hero-sub">숨은 지원금 1분만에 찾기!</p>
-                <h2 class="hero-title">
-                    나의 <span class="hero-highlight">숨은 지원금</span> 찾기
-                </h2>
-                <p class="hero-amount">신청자 <strong>1인 평균 127만원</strong> 수령</p>
-                <a class="hero-cta" href="<?php echo esc_url($main_url); ?>">
-                    30초만에 내 지원금 확인 <span class="cta-arrow">→</span>
-                </a>
-                <div class="hero-trust">
-                    <span class="trust-item">✓ 무료 조회</span>
-                    <span class="trust-item">✓ 30초 완료</span>
-                    <span class="trust-item">✓ 개인정보 보호</span>
-                </div>
-                <div class="hero-notice">
-                    <div class="notice-content">
-                        <div class="notice-title">💡신청 안하면 못 받아요</div>
-                        <p class="notice-desc">대한민국 92%가 놓치고 있는 정부 지원금, 지금 확인하고 혜택 놓치지 마세요!</p>
-                    </div>
-                </div>
-            </div>
-        </div>
-
+// 메타 박스 렌더링
+function render_support_card_meta_box($post) {
+    wp_nonce_field('support_card_meta', 'support_card_meta_nonce');
+    
+    $amount = get_post_meta($post->ID, '_card_amount', true);
+    $amount_sub = get_post_meta($post->ID, '_card_amount_sub', true);
+    $target = get_post_meta($post->ID, '_card_target', true);
+    $period = get_post_meta($post->ID, '_card_period', true);
+    $link = get_post_meta($post->ID, '_card_link', true);
+    $featured = get_post_meta($post->ID, '_card_featured', true);
+    
+    ?>
+    <style>
+        .support-card-field { margin-bottom: 15px; }
+        .support-card-field label { display: block; font-weight: bold; margin-bottom: 5px; }
+        .support-card-field input[type="text"],
+        .support-card-field input[type="url"] { width: 100%; padding: 8px; }
+        .support-card-field input[type="checkbox"] { margin-right: 5px; }
+    </style>
+    
+    <div class="support-card-field">
+        <label>금액/혜택 강조 *</label>
+        <input type="text" name="card_amount" value="<?php echo esc_attr($amount); ?>" 
+               placeholder="예: 최대 4.5% 금리" required />
     </div>
-</div>
+    
+    <div class="support-card-field">
+        <label>부가 설명</label>
+        <input type="text" name="card_amount_sub" value="<?php echo esc_attr($amount_sub); ?>" 
+               placeholder="예: 비과세 + 대출 우대" />
+    </div>
+    
+    <div class="support-card-field">
+        <label>지원대상 * (20글자 이내)</label>
+        <input type="text" name="card_target" value="<?php echo esc_attr($target); ?>" 
+               placeholder="예: 만 19~34세 청년" maxlength="20" required />
+    </div>
+    
+    <div class="support-card-field">
+        <label>신청시기 *</label>
+        <input type="text" name="card_period" value="<?php echo esc_attr($period); ?>" 
+               placeholder="예: 상시" required />
+    </div>
+    
+    <div class="support-card-field">
+        <label>링크 URL</label>
+        <input type="url" name="card_link" value="<?php echo esc_attr($link); ?>" 
+               placeholder="https://example.com" />
+    </div>
+    
+    <div class="support-card-field">
+        <label>
+            <input type="checkbox" name="card_featured" value="1" <?php checked($featured, '1'); ?> />
+            인기 카드로 표시
+        </label>
+    </div>
+    
+    <p><strong>참고:</strong> 카드 제목은 위의 제목 필드에, 한 줄 설명은 발췌 필드에 입력하세요.</p>
+    <?php
+}
 
-<?php get_footer(); ?>
+// 메타 데이터 저장
+function save_support_card_meta($post_id) {
+    if (!isset($_POST['support_card_meta_nonce']) || 
+        !wp_verify_nonce($_POST['support_card_meta_nonce'], 'support_card_meta')) {
+        return;
+    }
+    
+    if (defined('DOING_AUTOSAVE') && DOING_AUTOSAVE) {
+        return;
+    }
+    
+    if (!current_user_can('edit_post', $post_id)) {
+        return;
+    }
+    
+    $fields = ['card_amount', 'card_amount_sub', 'card_target', 'card_period', 'card_link'];
+    
+    foreach ($fields as $field) {
+        if (isset($_POST[$field])) {
+            update_post_meta($post_id, '_' . $field, sanitize_text_field($_POST[$field]));
+        }
+    }
+    
+    // 체크박스
+    $featured = isset($_POST['card_featured']) ? '1' : '0';
+    update_post_meta($post_id, '_card_featured', $featured);
+}
+add_action('save_post_support_card', 'save_support_card_meta');
+
+// 설정 페이지 추가
+function add_support_settings_page() {
+    add_options_page(
+        '지원금 스킨 설정',
+        '지원금 스킨',
+        'manage_options',
+        'support-skin-settings',
+        'render_support_settings_page'
+    );
+}
+add_action('admin_menu', 'add_support_settings_page');
+
+// 설정 페이지 렌더링
+function render_support_settings_page() {
+    if (isset($_POST['support_settings_submit'])) {
+        check_admin_referer('support_settings');
+        
+        update_option('support_main_url', sanitize_text_field($_POST['support_main_url']));
+        update_option('support_ad_platform', sanitize_text_field($_POST['support_ad_platform']));
+        update_option('support_ad_code', wp_kses_post($_POST['support_ad_code']));
+        
+        // 탭 데이터 저장
+        $tabs = [];
+        for ($i = 0; $i < 3; $i++) {
+            if (!empty($_POST["tab_name_$i"])) {
+                $tabs[] = [
+                    'name' => sanitize_text_field($_POST["tab_name_$i"]),
+                    'link' => esc_url_raw($_POST["tab_link_$i"]),
+                    'active' => isset($_POST["tab_active"]) && $_POST["tab_active"] == $i
+                ];
+            }
+        }
+        update_option('support_tabs', $tabs);
+        
+        echo '<div class="notice notice-success"><p>설정이 저장되었습니다.</p></div>';
+    }
+    
+    $main_url = get_option('support_main_url', '');
+    $ad_platform = get_option('support_ad_platform', 'adsense');
+    $ad_code = get_option('support_ad_code', '');
+    $tabs = get_option('support_tabs', []);
+    
+    ?>
+    <div class="wrap">
+        <h1>지원금 스킨 설정</h1>
+        
+        <form method="post">
+            <?php wp_nonce_field('support_settings'); ?>
+            
+            <table class="form-table">
+                <tr>
+                    <th>메인 URL</th>
+                    <td>
+                        <input type="url" name="support_main_url" value="<?php echo esc_attr($main_url); ?>" 
+                               class="regular-text" placeholder="https://example.com" />
+                        <p class="description">카드 클릭 시 연결될 기본 URL</p>
+                    </td>
+                </tr>
+                
+                <tr>
+                    <th>광고 플랫폼</th>
+                    <td>
+                        <select name="support_ad_platform">
+                            <option value="adsense" <?php selected($ad_platform, 'adsense'); ?>>구글 애드센스</option>
+                            <option value="dable" <?php selected($ad_platform, 'dable'); ?>>데이블</option>
+                            <option value="taboola" <?php selected($ad_platform, 'taboola'); ?>>타뷸라</option>
+                            <option value="custom" <?php selected($ad_platform, 'custom'); ?>>기타</option>
+                        </select>
+                    </td>
+                </tr>
+                
+                <tr>
+                    <th>광고 코드</th>
+                    <td>
+                        <textarea name="support_ad_code" rows="8" class="large-text code"><?php echo esc_textarea($ad_code); ?></textarea>
+                        <p class="description">광고 플랫폼에서 제공하는 코드를 붙여넣으세요</p>
+                    </td>
+                </tr>
+                
+                <tr>
+                    <th>탭 설정</th>
+                    <td>
+                        <?php for ($i = 0; $i < 3; $i++): 
+                            $tab = isset($tabs[$i]) ? $tabs[$i] : ['name' => '', 'link' => '', 'active' => false];
+                        ?>
+                        <div style="margin-bottom: 10px;">
+                            <input type="text" name="tab_name_<?php echo $i; ?>" 
+                                   value="<?php echo esc_attr($tab['name']); ?>" 
+                                   placeholder="탭 이름" style="width: 200px;" />
+                            <input type="url" name="tab_link_<?php echo $i; ?>" 
+                                   value="<?php echo esc_attr($tab['link']); ?>" 
+                                   placeholder="링크 URL" style="width: 300px;" />
+                            <label>
+                                <input type="radio" name="tab_active" value="<?php echo $i; ?>" 
+                                       <?php checked($tab['active'], true); ?> />
+                                활성
+                            </label>
+                        </div>
+                        <?php endfor; ?>
+                    </td>
+                </tr>
+            </table>
+            
+            <p class="submit">
+                <input type="submit" name="support_settings_submit" class="button button-primary" value="설정 저장" />
+            </p>
+        </form>
+    </div>
+    <?php
+}
+
+// 스타일시트와 스크립트 로드
+function enqueue_support_skin_assets() {
+    if (is_page_template('page-support.php')) {
+        wp_enqueue_style('support-skin-style', get_template_directory_uri() . '/css/support-skin.css');
+        wp_enqueue_script('support-skin-script', get_template_directory_uri() . '/js/support-skin.js', [], false, true);
+    }
+}
+add_action('wp_enqueue_scripts', 'enqueue_support_skin_assets');
