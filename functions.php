@@ -1,324 +1,120 @@
 <?php
 /**
- * Theme Name: jiwungumonlyskin
- * Theme URI: https://aros100.com
- * Description: 지원금 전용 스킨 - GitHub 블로그 호환 테마
- * Version: 1.0.0
- * Author: 아로스 (아백)
- * Author URI: https://aros100.com
- * Generated: 2026.01.04
+ * Template Name: 지원금 메인 페이지
+ * Description: 지원금 정보를 표시하는 커스텀 템플릿
  */
 
-// 보안: 직접 접근 차단
-if (!defined('ABSPATH')) {
-    exit;
-}
+get_header(); 
 
-// 테마 설정
-function support_fund_theme_setup() {
-    // HTML5 지원
-    add_theme_support('html5', array(
-        'search-form',
-        'comment-form',
-        'comment-list',
-        'gallery',
-        'caption',
-    ));
-    
-    // 타이틀 태그 지원
-    add_theme_support('title-tag');
-    
-    // 포스트 썸네일 지원
-    add_theme_support('post-thumbnails');
-    
-    // RSS 피드 링크
-    add_theme_support('automatic-feed-links');
-}
-add_action('after_setup_theme', 'support_fund_theme_setup');
+// 메인 URL 설정
+$main_url = 'https://index1.jiwungum100.qzz.io';
 
-// CSS 및 JS 로드
-function support_fund_enqueue_scripts() {
-    // CSS 로드
-    wp_enqueue_style(
-        'support-fund-style',
-        get_stylesheet_uri(),
-        array(),
-        '1.0.0'
-    );
-    
-    // Google Fonts
-    wp_enqueue_style(
-        'google-fonts',
-        'https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700&display=swap',
-        array(),
-        null
-    );
-    
-    // JavaScript 로드
-    wp_enqueue_script(
-        'support-fund-script',
-        get_template_directory_uri() . '/script.js',
-        array(),
-        '1.0.0',
-        true
-    );
-}
-add_action('wp_enqueue_scripts', 'support_fund_enqueue_scripts');
+// 탭 데이터
+$tabs = [
+    ['name' => '전국민 지원금', 'link' => 'https://index1.jiwungum100.qzz.io', 'active' => true],
+    ['name' => '청년지원금', 'link' => 'https://index1.jiwungum100.qzz.io', 'active' => false],
+    ['name' => '소상공인 지원금', 'link' => 'https://index1.jiwungum100.qzz.io', 'active' => false]
+];
 
-// 관리자 CSS 제거 (프론트엔드 스타일 유지)
-function support_fund_remove_admin_bar_css() {
-    remove_action('wp_head', 'wp_admin_bar_header');
-}
-add_action('get_header', 'support_fund_remove_admin_bar_css');
+// 카드 데이터
+$cards = [
+    [
+        'keyword' => '근로장려금',
+        'amount' => '최대 330만원',
+        'amountSub' => '연 1회 일시지급',
+        'description' => '일하는 저소득층을 위한 근로소득 지원금',
+        'target' => '근로소득 3천만원 미만 가구',
+        'period' => '매년 5월',
+        'featured' => true
+    ],
+    [
+        'keyword' => '자녀장려금',
+        'amount' => '최대 100만원',
+        'amountSub' => '자녀 1명당 70만원',
+        'description' => '저소득층 자녀양육비 부담 완화를 위한 지원금',
+        'target' => '부부합산 소득 4천만원 미만',
+        'period' => '매년 5월',
+        'featured' => false
+    ]
+];
 
-// body 클래스 추가
-function support_fund_body_classes($classes) {
-    $classes[] = 'support-fund-theme';
-    return $classes;
-}
-add_filter('body_class', 'support_fund_body_classes');
+?>
 
-// 광고 코드 단축코드 지원
-function support_fund_ad_shortcode($atts) {
-    $atts = shortcode_atts(array(
-        'code' => '',
-    ), $atts);
-    
-    if (empty($atts['code'])) {
-        return '';
-    }
-    
-    return '<div class="ad-card"><div style="display:flex; justify-content:center; width:100%;">' . 
-           do_shortcode($atts['code']) . 
-           '</div></div>';
-}
-add_shortcode('ad', 'support_fund_ad_shortcode');
-
-// 이탈 방지 팝업 설정 (커스터마이저)
-function support_fund_customize_register($wp_customize) {
-    // 팝업 섹션 추가
-    $wp_customize->add_section('support_fund_popup', array(
-        'title' => '이탈 방지 팝업 설정',
-        'priority' => 30,
-    ));
-    
-    // 팝업 활성화
-    $wp_customize->add_setting('popup_enabled', array(
-        'default' => true,
-        'transport' => 'refresh',
-    ));
-    
-    $wp_customize->add_control('popup_enabled', array(
-        'label' => '팝업 활성화',
-        'section' => 'support_fund_popup',
-        'type' => 'checkbox',
-    ));
-    
-    // 팝업 제목
-    $wp_customize->add_setting('popup_title', array(
-        'default' => '🎁 잠깐! 놓치신 혜택이 있어요',
-        'transport' => 'refresh',
-    ));
-    
-    $wp_customize->add_control('popup_title', array(
-        'label' => '팝업 제목',
-        'section' => 'support_fund_popup',
-        'type' => 'text',
-    ));
-    
-    // 팝업 내용
-    $wp_customize->add_setting('popup_desc', array(
-        'default' => '지금 확인 안 하면<br><strong>최대 300만원</strong> 지원금을 못 받을 수 있어요!',
-        'transport' => 'refresh',
-    ));
-    
-    $wp_customize->add_control('popup_desc', array(
-        'label' => '팝업 설명',
-        'section' => 'support_fund_popup',
-        'type' => 'textarea',
-    ));
-}
-add_action('customize_register', 'support_fund_customize_register');
-
-// 팝업 데이터 JavaScript에 전달
-function support_fund_popup_data() {
-    if (!get_theme_mod('popup_enabled', true)) {
-        return;
-    }
-    
-    $popup_title = get_theme_mod('popup_title', '🎁 잠깐! 놓치신 혜택이 있어요');
-    $popup_desc = get_theme_mod('popup_desc', '지금 확인 안 하면<br><strong>최대 300만원</strong> 지원금을 못 받을 수 있어요!');
-    
-    echo '<script>';
-    echo 'var supportFundPopupData = {';
-    echo 'enabled: true,';
-    echo 'title: ' . json_encode($popup_title) . ',';
-    echo 'desc: ' . json_encode($popup_desc);
-    echo '};';
-    echo '</script>';
-}
-add_action('wp_head', 'support_fund_popup_data');
-
-// 커스텀 포스트 타입: 지원금 카드
-function support_fund_register_card_post_type() {
-    register_post_type('support_card', array(
-        'labels' => array(
-            'name' => '지원금 카드',
-            'singular_name' => '카드',
-            'add_new' => '새 카드 추가',
-            'add_new_item' => '새 카드 추가',
-            'edit_item' => '카드 편집',
-            'new_item' => '새 카드',
-            'view_item' => '카드 보기',
-            'search_items' => '카드 검색',
-            'not_found' => '카드가 없습니다',
-            'not_found_in_trash' => '휴지통에 카드가 없습니다'
-        ),
-        'public' => true,
-        'has_archive' => true,
-        'menu_icon' => 'dashicons-money-alt',
-        'supports' => array('title', 'editor', 'thumbnail', 'excerpt'),
-        'show_in_rest' => true,
-    ));
-}
-add_action('init', 'support_fund_register_card_post_type');
-
-// 카드 메타박스
-function support_fund_add_card_metaboxes() {
-    add_meta_box(
-        'support_card_details',
-        '카드 상세 정보',
-        'support_fund_card_metabox_callback',
-        'support_card',
-        'normal',
-        'high'
-    );
-}
-add_action('add_meta_boxes', 'support_fund_add_card_metaboxes');
-
-function support_fund_card_metabox_callback($post) {
-    wp_nonce_field('support_fund_save_card_meta', 'support_fund_card_nonce');
-    
-    $amount = get_post_meta($post->ID, '_card_amount', true);
-    $amount_sub = get_post_meta($post->ID, '_card_amount_sub', true);
-    $target = get_post_meta($post->ID, '_card_target', true);
-    $period = get_post_meta($post->ID, '_card_period', true);
-    $link = get_post_meta($post->ID, '_card_link', true);
-    $featured = get_post_meta($post->ID, '_card_featured', true);
-    
-    ?>
-    <p>
-        <label><strong>금액/혜택:</strong></label><br>
-        <input type="text" name="card_amount" value="<?php echo esc_attr($amount); ?>" style="width:100%;" placeholder="예: 최대 4.5% 금리">
-    </p>
-    <p>
-        <label><strong>부가 설명:</strong></label><br>
-        <input type="text" name="card_amount_sub" value="<?php echo esc_attr($amount_sub); ?>" style="width:100%;" placeholder="예: 비과세 + 대출 우대">
-    </p>
-    <p>
-        <label><strong>지원대상:</strong></label><br>
-        <input type="text" name="card_target" value="<?php echo esc_attr($target); ?>" style="width:100%;" placeholder="예: 만 19~34세 청년" maxlength="20">
-    </p>
-    <p>
-        <label><strong>신청시기:</strong></label><br>
-        <input type="text" name="card_period" value="<?php echo esc_attr($period); ?>" style="width:100%;" placeholder="예: 상시">
-    </p>
-    <p>
-        <label><strong>링크 URL:</strong></label><br>
-        <input type="url" name="card_link" value="<?php echo esc_attr($link); ?>" style="width:100%;" placeholder="https://example.com">
-    </p>
-    <p>
-        <label>
-            <input type="checkbox" name="card_featured" value="1" <?php checked($featured, '1'); ?>>
-            <strong>인기 카드로 표시</strong>
-        </label>
-    </p>
-    <?php
-}
-
-function support_fund_save_card_meta($post_id) {
-    if (!isset($_POST['support_fund_card_nonce']) || 
-        !wp_verify_nonce($_POST['support_fund_card_nonce'], 'support_fund_save_card_meta')) {
-        return;
-    }
-    
-    if (defined('DOING_AUTOSAVE') && DOING_AUTOSAVE) {
-        return;
-    }
-    
-    if (!current_user_can('edit_post', $post_id)) {
-        return;
-    }
-    
-    if (isset($_POST['card_amount'])) {
-        update_post_meta($post_id, '_card_amount', sanitize_text_field($_POST['card_amount']));
-    }
-    
-    if (isset($_POST['card_amount_sub'])) {
-        update_post_meta($post_id, '_card_amount_sub', sanitize_text_field($_POST['card_amount_sub']));
-    }
-    
-    if (isset($_POST['card_target'])) {
-        update_post_meta($post_id, '_card_target', sanitize_text_field($_POST['card_target']));
-    }
-    
-    if (isset($_POST['card_period'])) {
-        update_post_meta($post_id, '_card_period', sanitize_text_field($_POST['card_period']));
-    }
-    
-    if (isset($_POST['card_link'])) {
-        update_post_meta($post_id, '_card_link', esc_url_raw($_POST['card_link']));
-    }
-    
-    update_post_meta($post_id, '_card_featured', isset($_POST['card_featured']) ? '1' : '0');
-}
-add_action('save_post_support_card', 'support_fund_save_card_meta');
-
-// 카드 출력 함수
-function support_fund_display_cards($limit = -1) {
-    $args = array(
-        'post_type' => 'support_card',
-        'posts_per_page' => $limit,
-        'orderby' => 'menu_order',
-        'order' => 'ASC'
-    );
-    
-    $cards = new WP_Query($args);
-    
-    if ($cards->have_posts()) {
-        echo '<div class="info-card-grid">';
+<div class="support-main-wrapper">
+    <div class="support-container">
         
-        while ($cards->have_posts()) {
-            $cards->the_post();
-            
-            $amount = get_post_meta(get_the_ID(), '_card_amount', true);
-            $amount_sub = get_post_meta(get_the_ID(), '_card_amount_sub', true);
-            $target = get_post_meta(get_the_ID(), '_card_target', true);
-            $period = get_post_meta(get_the_ID(), '_card_period', true);
-            $link = get_post_meta(get_the_ID(), '_card_link', true);
-            $featured = get_post_meta(get_the_ID(), '_card_featured', true);
-            
-            $featured_class = ($featured == '1') ? ' featured' : '';
-            $badge = ($featured == '1') ? '<span class="info-card-badge">🔥 인기</span>' : '';
-            
+        <!-- 탭 네비게이션 -->
+        <div class="tab-wrapper">
+            <div class="support-container">
+                <nav class="tab-container">
+                    <ul class="tabs">
+                        <?php foreach ($tabs as $tab): ?>
+                        <li class="tab-item">
+                            <a class="tab-link <?php echo $tab['active'] ? 'active' : ''; ?>" 
+                               href="<?php echo esc_url($tab['link']); ?>">
+                                <?php echo esc_html($tab['name']); ?>
+                            </a>
+                        </li>
+                        <?php endforeach; ?>
+                    </ul>
+                </nav>
+            </div>
+        </div>
+
+        <!-- 상단 인트로 -->
+        <div class="intro-section">
+            <span class="intro-badge">신청마감 D-3일</span>
+            <p class="intro-sub">숨은 보험금 1분만에 찾기!</p>
+            <h2 class="intro-title">숨은 지원금 찾기</h2>
+        </div>
+
+        <!-- 애드센스 광고 -->
+        <?php if (function_exists('display_adsense_code')): ?>
+            <?php display_adsense_code(); ?>
+        <?php endif; ?>
+
+        <!-- 정보 박스 -->
+        <div class="info-box">
+            <div class="info-box-header">
+                <span class="info-box-icon">🏷️</span>
+                <span class="info-box-title">신청 안하면 절대 못 받아요</span>
+            </div>
+            <div class="info-box-amount">1인 평균 127만원 환급</div>
+            <p class="info-box-desc">대한민국 92%가 놓치고 있는 정부 지원금! 지금 확인하고 혜택 놓치지 마세요.</p>
+        </div>
+
+        <!-- 카드 그리드 -->
+        <div class="info-card-grid">
+            <?php 
+            $card_count = 0;
+            foreach ($cards as $card): 
+                // 광고 삽입 위치 (1, 4, 7번째 카드 전)
+                if (function_exists('display_inline_ad') && in_array($card_count, [0, 3, 6])):
+                    display_inline_ad();
+                endif;
+                $card_count++;
             ?>
-            <a class="info-card<?php echo $featured_class; ?>" href="<?php echo esc_url($link); ?>">
+            
+            <a class="info-card <?php echo $card['featured'] ? 'featured' : ''; ?>" 
+               href="<?php echo esc_url($main_url); ?>">
                 <div class="info-card-highlight">
-                    <?php echo $badge; ?>
-                    <div class="info-card-amount"><?php echo esc_html($amount); ?></div>
-                    <div class="info-card-amount-sub"><?php echo esc_html($amount_sub); ?></div>
+                    <?php if ($card['featured']): ?>
+                        <span class="info-card-badge">🔥 인기</span>
+                    <?php endif; ?>
+                    <div class="info-card-amount"><?php echo esc_html($card['amount']); ?></div>
+                    <div class="info-card-amount-sub"><?php echo esc_html($card['amountSub']); ?></div>
                 </div>
                 <div class="info-card-content">
-                    <h3 class="info-card-title"><?php the_title(); ?></h3>
-                    <p class="info-card-desc"><?php echo esc_html(get_the_excerpt()); ?></p>
+                    <h3 class="info-card-title"><?php echo esc_html($card['keyword']); ?></h3>
+                    <p class="info-card-desc"><?php echo esc_html($card['description']); ?></p>
                     <div class="info-card-details">
                         <div class="info-card-row">
                             <span class="info-card-label">지원대상</span>
-                            <span class="info-card-value"><?php echo esc_html($target); ?></span>
+                            <span class="info-card-value"><?php echo esc_html($card['target']); ?></span>
                         </div>
                         <div class="info-card-row">
                             <span class="info-card-label">신청시기</span>
-                            <span class="info-card-value"><?php echo esc_html($period); ?></span>
+                            <span class="info-card-value"><?php echo esc_html($card['period']); ?></span>
                         </div>
                     </div>
                     <div class="info-card-btn">
@@ -326,53 +122,37 @@ function support_fund_display_cards($limit = -1) {
                     </div>
                 </div>
             </a>
-            <?php
-        }
-        
-        echo '</div>';
-        wp_reset_postdata();
-    }
-}
+            
+            <?php endforeach; ?>
+        </div>
 
-// 단축코드로 카드 출력
-function support_fund_cards_shortcode($atts) {
-    $atts = shortcode_atts(array(
-        'limit' => -1,
-    ), $atts);
-    
-    ob_start();
-    support_fund_display_cards($atts['limit']);
-    return ob_start();
-}
-add_shortcode('support_cards', 'support_fund_cards_shortcode');
+        <!-- 히어로 섹션 -->
+        <div class="hero-section">
+            <div class="hero-content">
+                <span class="hero-urgent">🔥 신청마감 D-3일</span>
+                <p class="hero-sub">숨은 지원금 1분만에 찾기!</p>
+                <h2 class="hero-title">
+                    나의 <span class="hero-highlight">숨은 지원금</span> 찾기
+                </h2>
+                <p class="hero-amount">신청자 <strong>1인 평균 127만원</strong> 수령</p>
+                <a class="hero-cta" href="<?php echo esc_url($main_url); ?>">
+                    30초만에 내 지원금 확인 <span class="cta-arrow">→</span>
+                </a>
+                <div class="hero-trust">
+                    <span class="trust-item">✓ 무료 조회</span>
+                    <span class="trust-item">✓ 30초 완료</span>
+                    <span class="trust-item">✓ 개인정보 보호</span>
+                </div>
+                <div class="hero-notice">
+                    <div class="notice-content">
+                        <div class="notice-title">💡신청 안하면 못 받아요</div>
+                        <p class="notice-desc">대한민국 92%가 놓치고 있는 정부 지원금, 지금 확인하고 혜택 놓치지 마세요!</p>
+                    </div>
+                </div>
+            </div>
+        </div>
 
-// 관리자 알림
-function support_fund_admin_notice() {
-    $screen = get_current_screen();
-    if ($screen->id !== 'themes') {
-        return;
-    }
-    ?>
-    <div class="notice notice-success is-dismissible">
-        <p><strong>지원금 스킨</strong>이 활성화되었습니다! 외모 → 사용자 정의하기에서 추가 설정이 가능합니다.</p>
-        <p>제작: <a href="https://aros100.com" target="_blank">아백 (아로스)</a></p>
     </div>
-    <?php
-}
-add_action('admin_notices', 'support_fund_admin_notice');
+</div>
 
-// 테마 활성화 시 실행
-function support_fund_theme_activation() {
-    flush_rewrite_rules();
-}
-add_action('after_switch_theme', 'support_fund_theme_activation');
-
-// 보안 헤더
-function support_fund_security_headers() {
-    header('X-Content-Type-Options: nosniff');
-    header('X-Frame-Options: SAMEORIGIN');
-    header('X-XSS-Protection: 1; mode=block');
-}
-add_action('send_headers', 'support_fund_security_headers');
-
-?>
+<?php get_footer(); ?>
